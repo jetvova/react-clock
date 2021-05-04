@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>React Clock</title>
+    <style>
+        @font-face {
+            font-family: 'Digital';
+            src: url('fonts/digital-7m.ttf');
+        }
+        body { background-color: whitesmoke; }
+        .slider { width: 95% }
+        .digital { 
+            width: 700px;
+            height: 200px;
+            text-align: right;
+            font-family: Digital; 
+            font-size: 180px;
+        }
+        .analog {
+            margin-left: 150px;
+            width: 509px;
+            height: 509px;
+            border-color:
+            whitesmoke;
+            border-width: 1px;
+            border-style: solid;
+            background-image: url('images/clock_handless.png');
+        }
+        /*
+          Credit to: Michael Sinz for CSS-based clock hand rendering & animation:
+          http://www.sinz.org/Clock/simple.html
+        */
+        .hand {
+            position: relative;
+            top: 50%;
+            left: 50%;
+            border-top-left-radius: 25%;
+            border-top-right-radius: 25%;
+            transition-duration: 0.2s;
+        }
+        .hand.hour {
+            background-color: black;
+            width: 4%;
+            height: 29%;
+            margin-top: -28.6%;
+            margin-left: -2.75%;
+            transform-origin: 50% 100%;
+            -webkit-transform-origin: 50% 100%;
+        }
+        .hand.minute {
+            background-color: black;
+            width: 3%;
+            height: 45%;
+            margin-top: -45%;
+            margin-left: -2.3%;
+            transform-origin: 50% 100%;
+            -webkit-transform-origin: 50% 100%;
+        }
+
+
+    </style>
+
+  </head>
+  <body>
+    <div id="app_container"></div>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        class Time extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { minutes: 720 };
+            }
+            formatTime() {
+                const zeroPad = (num, places) => String(num).padStart(places, '0');
+                const amPm = ["AM","PM"][ Math.floor(this.state.minutes / 60 / 12) % 2 ];
+                var hour = Math.floor(this.state.minutes / 60) % 12;
+                if (hour == 0) { hour = 12; }
+
+                return hour + ":"
+                   + zeroPad(this.state.minutes % 60, 2)
+                   + " " + amPm;
+            }
+
+            hourRotation() {
+                return 'rotate(' + this.state.minutes / 60 * (360/12) + 'deg)';
+            }
+
+            minuteRotation() {
+                return 'rotate(' + this.state.minutes * (360/60) + 'deg)';
+            }
+
+            render() {
+                return (
+                    <div> {/* Time Control */}
+                        
+                        {/* Digital Clock */}
+                        <div className="digital">
+                            { this.formatTime() }
+                        </div>
+
+                        {/* Analog Clock */}
+                        <div className="analog">
+                            <div className="hour hand" style={{
+                                        transform: this.hourRotation(),
+                                        WebkitTransform: this.hourRotation()
+                                    }}>
+                            </div>
+                            <div className="minute hand" style={{
+                                        transform: this.minuteRotation(),
+                                        WebkitTransform: this.minuteRotation()
+                                    }}>
+                            </div>
+                        </div>
+                        
+                        {/* Slider */}
+                        <div>
+                            <input type="range" min="0" max="1440" className="slider"
+                                value={this.state.minutes}
+                                onChange={
+                                    (event) => this.setState({ minutes: event.target.value })
+                                }/>
+                        </div>
+                    </div>
+                )
+            }
+        }
+        
+        ReactDOM.render(
+            React.createElement(Time),
+            document.querySelector('#app_container'));
+    </script>
+
+
+  </body>
+</html>
